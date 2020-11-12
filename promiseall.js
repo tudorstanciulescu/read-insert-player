@@ -17,6 +17,8 @@ for(let i=0;i<10;i++) {
 }
 
 
+
+
 Promise.all(array2).then(values => { 
   console.log(values); 
 });
