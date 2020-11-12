@@ -1,0 +1,22 @@
+{
+  "name": "read-insert-player",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "download-google-spreadsheet": "^0.1.1",
+    "google-spreadsheet": "^2.0.6",
+    "ioredis": "^4.19.2",
+    "node-forge": "^0.10.0",
+    "read-excel-file": "^4.0.7",
+    "redis": "^3.0.2",
+    "request-promise": "^4.2.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
