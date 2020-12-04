@@ -11,36 +11,26 @@ var json;
 var inf;
 var objects = [];
 var BanPick = [];
-var player11 = [];
-var player22 = [];
 var player1;
 var player2;
 var toornamentArray = [];
 var player_data = [];
-var obb;
 var row_data_to_redis = [];
 var x = 0;
 var redisIp = variables.connection.redisIp;
-var redisDB = variables.connection.redisDBquake;
-
-var match_redis=[];
+var aaaaa;
 
 
 
 var db = redis.createClient(6379, redisIp);
 
-// redisClients[clientName] = redis.createClient(6379, redisClients[clientName]);
 db.auth('YfjcjkULNVVQdqaLYMK6gFxv7M6VmGt9zxctNCbfHku42xZju64CdfAkSgYQWT4v');
-
-
 // db.auth(variables.connection.redisPass,() => {
 // });
 // db.select(redisDB);
-
 async function accessSpreadsheet() {
 
-    const doc = new GoogleSpreadsheet('17bkfOIfBCOfaXY7eM3acg-unJprTbSX6UJIHlP0LrTk');
-    //const doc = new GoogleSpreadsheet('1c4yHhbEdXbuYUdQzkeGDnOBssjptRRZIuQhNCUSdXJI');  //aceess the data from specific gss
+    const doc = new GoogleSpreadsheet('1nHmmw2NYNfV_VFAxacpn2M3kz6pIWCtgsTC2gAllM2o');
     await promisify(doc.useServiceAccountAuth)(creds);
     const info = await promisify(doc.getInfo)();
     const docTitle = info.title;
@@ -50,11 +40,8 @@ async function accessSpreadsheet() {
     })
     console.log(`Document Title: ${docTitle}`);
     console.log(`Sheet Title: ${sheet.title}`);
-    console.log(`${docTitle} spreadsheet URL: https://docs.google.com/spreadsheets/d/1c4yHhbEdXbuYUdQzkeGDnOBssjptRRZIuQhNCUSdXJI/edit#gid=0`)
+    console.log(`${docTitle} spreadsheet URL: https://docs.google.com/spreadsheets/d/1nHmmw2NYNfV_VFAxacpn2M3kz6pIWCtgsTC2gAllM2o/edit#gid=640917880`)
     console.log(`Rows count in sheet: ${rows.length}`);
-    // console.log(rows);
-    //console.log(rows[1]);
-
     for (let i = 0; i < meciuri.length; i++) {
         player1 = 0;
         player2 = 0;
@@ -74,7 +61,6 @@ async function accessSpreadsheet() {
                     p2action: rows[j].p2action
 
                 }
-                //console.log(json);
                 BanPick[inf] = json;
                 inf++;
             }
@@ -139,10 +125,7 @@ async function accessSpreadsheet() {
         }
 
         maps[(maps.length) - 1].playerKey = "remaining";
-        //console.log(maps[maps.length-1].playerKey);
-
-
-        if (champions[0].champName != '') {
+         if (champions[0].champName != '') {
             //if veto data              
             var data_to_redis = {
                 match_data: match_data,
@@ -151,10 +134,7 @@ async function accessSpreadsheet() {
                 maps: maps
 
             }
-            //console.log(player1," ",player2);        
-            //console.log(data_to_redis);
-            // player11[i]=player1;
-            // player22[i]=player2;
+         
 
             row_data_to_redis[x] = {
                 player2: player2,
@@ -163,16 +143,23 @@ async function accessSpreadsheet() {
             };
 
             x++;
-            // db.select(13, function(err,res) {
-            //     redis = JSON.stringify(data_to_redis);
-            //     db.set(`veto_w_10:${player11[i]}_${player22[i]}`,redis);
-            //                                  })
-
-
+   
 
         }
 
     }
+
+    
+
+    for(let i=0;i<row_data_to_redis.length;i++) {
+        if(row_data_to_redis[i].data_to_redis.champions[0].playerKey != makeSlug.makeSlug(player1)) {
+
+            row_data_to_redis[i].player1 = row_data_to_redis[i].data_to_redis.champions[0].playerKey;
+            row_data_to_redis[i].player2 = row_data_to_redis[i].data_to_redis.champions[1].playerKey;
+
+        }
+    }
+    
 
 
     function getPlayerRedis() {
@@ -213,28 +200,20 @@ async function accessSpreadsheet() {
         })
     }
 
-    // getTournamentRedis();
-
-
-    // getPlayerRedis()
-    // getPlayerRedis().then((player) => {
-    //  console.log(player) 
-    // })
-
     async function mainFunction() {
-        // let toornamentData = await getTournamentRedis();
-
+         let toornamentData = await getTournamentRedis();
         let playersData = await getPlayerRedis();
-       // console.log(playersData);
-       
-        for (let i = 0; i < row_data_to_redis.length; i++) { 
-        //    console.log(row_data_to_redis[i].player1);
-        //    console.log(row_data_to_redis[i].player2)
+        //console.log(toornamentData);
+
+        var toornament = [];
+        for(let i=0;i<toornamentData.length;i++) {
+            for(let j=0;j<toornamentData[i].length;j++){
+                toornament.push(toornamentData[i][j]);
+            }
         }
-       
+   
 
         for (let i = 0; i < row_data_to_redis.length; i++) {
-
             //console.log(row_data_to_redis[i].player1,row_data_to_redis[i].player2);
             for (j = 0; j < playersData.length; j++) {
                 // console.log(playersData[j].nickname);
@@ -252,7 +231,9 @@ async function accessSpreadsheet() {
         }
 
 
-
+        for(let i=0;i<row_data_to_redis.length;i++) {
+            console.log(row_data_to_redis[i].data_to_redis);
+        }
 
         Obj_to_redis = {};
         var toSendObj = {}; 
@@ -274,8 +255,8 @@ async function accessSpreadsheet() {
             toSendObj.payload.data = rowData;
             toSendObj.payload.data.title = "picks and bans";
             Obj_to_redis = JSON.stringify(toSendObj);
-           
-            db.set(`veto_w_10:${row_data_to_redis[i].player1}_${row_data_to_redis[i].player2}`, Obj_to_redis);
+                
+           db.set(`veto_w_11:${row_data_to_redis[i].player1}_${row_data_to_redis[i].player2}`, Obj_to_redis);
             
 
         }
